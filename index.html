@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测运气小应用</title>
+    <script src="https://cdn.jsdelivr.net/npm/chinese-lunar@1.0.0/dist/chinese-lunar.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .content {
+            margin-top: 50px;
+        }
+        .date, .luck-message {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .luck-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .luck-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .luck-button:hover {
+            background-color: #45a049;
+        }
+        .card {
+            width: 120px;
+            height: 180px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #333;
+            opacity: 0;
+            transform: rotateY(180deg);
+            transition: transform 1s, opacity 1s;
+        }
+        .flipping {
+            transform: rotateY(0deg);
+            opacity: 1;
+        }
+        .fortune-text {
+            font-size: 30px;
+            color: #f44336;
+        }
+        #message {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #000;
+        }
+        #retry-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #FF5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #retry-button:hover {
+            background-color: #e64a19;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <!-- 当前日期和农历 -->
+        <div class="date" id="date"></div>
+        <div class="date" id="lunar"></div>
+        <div class="date" id="huangli"></div>
+
+        <!-- 运势提示 -->
+        <div class="luck-message">快来看看今天运势如何</div>
+
+        <!-- 运势按钮 -->
+        <div class="luck-buttons">
+            <button class="luck-button" id="btn1">抽我</button>
+            <button class="luck-button" id="btn2">抽我</button>
+            <button class="luck-button" id="btn3">抽我</button>
+        </div>
+
+        <!-- 翻牌动画 -->
+        <div class="card" id="card"></div>
+
+        <!-- 随机运势和提示 -->
+        <div id="message"></div>
+
+        <!-- 重新测运势按钮 -->
+        <div id="retry-button-container"></div>
+    </div>
+
+    <script>
+        // 显示当前日期
+        function updateDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'Asia/Shanghai' };
+            document.getElementById('date').textContent = `今天是：${today.toLocaleString('zh-CN', options)}`;
+
+            // 获取农历日期
+            const lunar = chineseLunar.solarToLunar(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            const lunarDate = `${lunar.year}年 ${lunar.month}月 ${lunar.day}日`;
+            document.getElementById('lunar').textContent = `农历：${lunarDate}`;
+
+            // 模拟黄历（可以使用其他API来获取实际黄历）
+            document.getElementById('huangli').textContent = '黄历：宜出行，忌动土';
+        }
+
+        // 随机选择运势
+        function getRandomFortune() {
+            const fortunes = ['大吉', '非常吉', '特别吉'];
+            return fortunes[Math.floor(Math.random() * fortunes.length)];
+        }
+
+        // 执行翻牌动画并显示运势
+        function flipCard() {
+            const card = document.getElementById('card');
+            card.classList.add('flipping');
+
+            setTimeout(() => {
+                const fortune = getRandomFortune();
+                card.textContent = fortune;
+                document.getElementById('message').textContent = "想啥啥有，干啥啥成！";
+                showRetryButton();
+            }, 1000);  // 动画1秒后显示结果
+        }
+
+        // 显示重新测运势按钮
+        function showRetryButton() {
+            const retryButtonContainer = document.getElementById('retry-button-container');
+            const retryButton = document.createElement('button');
+            retryButton.id = 'retry-button';
+            retryButton.textContent = "真准，再测1次！";
+            retryButton.addEventListener('click', () => {
+                location.reload();  // 点击后刷新页面
+            });
+            retryButtonContainer.innerHTML = '';  // 清空之前的按钮
+            retryButtonContainer.appendChild(retryButton);
+        }
+
+        // 处理点击事件
+        document.getElementById('btn1').addEventListener('click', () => {
+            flipCard();
+        });
+        document.getElementById('btn2').addEventListener('click', () => {
+            flipCard();
+        });
+        document.getElementById('btn3').addEventListener('click', () => {
+            flipCard();
+        });
+
+        // 每秒更新一次时间
+        setInterval(updateDate, 1000);  // 每秒更新时间
+
+        // 初始化
+        updateDate(); // 第一次加载时更新一次日期
+    </script>
+</body>
+</html>
