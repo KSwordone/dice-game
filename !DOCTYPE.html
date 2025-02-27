@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掷骰子游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+        }
+        .timer {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        .table {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+        }
+        .area {
+            width: 130px;
+            height: 130px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            background-color: #fff;
+        }
+        .dice {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            margin: 10px auto;
+            visibility: hidden;
+        }
+        .message {
+            font-size: 30px;
+            color: green;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="timer" id="timer">5</div>
+        <div class="table">
+            <div class="area" id="large">大</div>
+            <div class="area" id="small">小</div>
+        </div>
+        <div class="dice" id="dice">1</div>
+        <div class="message" id="message">胜利</div>
+    </div>
+
+    <script>
+        let countdown = 5;
+        let timerInterval;
+        let diceTimeout;
+        let messageTimeout;
+
+        // 初始化游戏
+        function startGame() {
+            document.getElementById('large').textContent = "大";
+            document.getElementById('small').textContent = "小";
+            document.getElementById('message').style.visibility = "hidden";
+            document.getElementById('dice').style.visibility = "hidden";
+
+            countdown = 5;
+            document.getElementById('timer').textContent = countdown;
+            startCountdown();
+        }
+
+        // 倒计时功能
+        function startCountdown() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('timer').textContent = countdown;
+                if (countdown === 0) {
+                    clearInterval(timerInterval);
+                    showDiceRollMessage();
+                }
+            }, 1000);
+        }
+
+        // 显示"开始掷骰子啦"
+        function showDiceRollMessage() {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = "开始掷骰子啦";
+            messageElement.style.visibility = "visible";
+            setTimeout(() => {
+                messageElement.style.visibility = "hidden";
+                rollDice();
+            }, 1000); // 显示1秒后消失
+        }
+
+        // 掷骰子动画
+        function rollDice() {
+            const diceElement = document.getElementById('dice');
+            diceElement.style.visibility = "visible";
+            let rollCount = 0;
+            diceElement.textContent = getRandomDiceNumber();
+            diceElement.style.transform = "rotate(0deg)";
+            
+            const diceInterval = setInterval(() => {
+                rollCount++;
+                diceElement.textContent = getRandomDiceNumber();
+                diceElement.style.transform = "rotate(" + (rollCount * 60) + "deg)";
+                if (rollCount >= 10) {
+                    clearInterval(diceInterval);
+                    const finalNumber = getRandomDiceNumber();
+                    diceElement.textContent = finalNumber;
+                    showResult(finalNumber);
+                }
+            }, 100); // 每100毫秒切换骰子点数
+        }
+
+        // 获取一个随机骰子数
+        function getRandomDiceNumber() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        // 根据骰子数显示胜利
+        function showResult(diceNumber) {
+            const largeArea = document.getElementById('large');
+            const smallArea = document.getElementById('small');
+            const messageElement = document.getElementById('message');
+            
+            if (diceNumber <= 3) {
+                smallArea.textContent = "小获胜";
+                largeArea.textContent = "大";
+            } else {
+                largeArea.textContent = "大获胜";
+                smallArea.textContent = "小";
+            }
+
+            // 显示胜利信息4秒后重新开始
+            messageTimeout = setTimeout(() => {
+                startGame();
+            }, 4000);
+        }
+
+        // 启动游戏
+        startGame();
+    </script>
+
+</body>
+</html>
